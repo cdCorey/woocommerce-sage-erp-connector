@@ -1,0 +1,70 @@
+*** WooCommerce Sage ERP Connector Changelog ***
+
+2014.03.01 - version 1.1
+ * Misc - WooCommerce 2.1 compatible + required
+
+2013.09.12 - version 1.0.2
+ * Tweak - Update WP Admin Message Handler to 1.0.1
+ * Fix - When using the extended API, the proper postal code (Billing or Shipping) is created
+
+2013.07.19 - version 1.0.1
+ * Feature - You can now edit or delete the customer's Sage ERP Customer Number or AR Division Number from the Edit User page
+
+2013.05.28 - version 1.0
+ * WooCommerce 2.0 Compatibility
+ * Total rewrite to be faster and more flexible
+
+2012.12.20 - version 0.7.1.1
+ * Fix - WP 3.5 db prepare warning
+
+2012.10.25 - version 0.7.1
+ * Feature - add filter for Terms Code (wc_sage_erp_mas_connector_customer_terms_code and wc_sage_erp_mas_connector_sales_order_terms_code)
+ * Fix - use original sales order number when attempting re-import after ZIP code export failure / insert
+
+2012.10.23 - version 0.7.0
+ * Feature - Sage order export status column on 'Orders' page and new order action button
+ * Feature - Option to restrict export to orders with specific status
+ * Feature - new filters for Division Number and Price Level (wc_sage_erp_mas_connector_ar_division_no and wc_sage_erp_mas_connector_price_level)
+ * Fix - typos
+
+2012.08.06 - version 0.6.2
+ * Feature - More generic payment method handling, allowing for check-type payment methods
+
+2012.08.03 - version 0.6.1
+ * Tweak - Customer name, address lines, city formatted with ucwords()
+ * Tweak - US phone numbers formatted as NNN-NNN-NNNN
+ * Tweak - payment type no longer translated by plugin, instead passed to new filter wc_sage_erp_mas_connector_translate_payment_type
+ * Tweak - pre-tax Cart Discount passed as DiscountAmt when creating a new Sage order
+ * Tweak - Configured Salesperson Number passed to update customer Sage call
+
+2012.06.27 - version 0.6.0
+* Feature - implements new WC Integration API
+* Feature - CreateZip API call for unknown postcodes
+* Tweak - modified a bunch of sage order field mappings
+* Tweak - postcode length validation on checkout
+* Fix - a bunch of rouge notices
+
+2012.05.29 - version 0.5.0
+* Simplified codebase to make use of the new custom order number actions/filters in WooCommerce 1.5.6
+
+2012.05.16 - version 0.4.0
+* New fields added to the create_sales_order call:
+    * payment type
+    * credit card number
+    * braintree transaction id
+    * credit card expiration month
+    * credit card expiration year
+    * coupons used
+
+2012.05.13 - version 0.3.1
+* Minor updates related to WooCommerce 1.5.5 release
+
+2012.04.30 - version 0.3.0
+ * Disabled 'Processing Order' email
+ * Added 'Export to MAS' action buttons on the Order List table, and Order Detail pages
+
+2012.04.20 - version 0.2.0
+ * Added support for the WooCommerce order tracking page
+
+2012.04.01 - version 0.1.0
+ * Private beta
