@@ -16,7 +16,7 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 
 ## Installation
 
-* Download the [ZIP][https://github.com/skyverge/woocommerce-sage-erp-connector/archive/master.zip] and upload to your `/wp-content/plugins` directory
+* Download the [ZIP](https://github.com/skyverge/woocommerce-sage-erp-connector/archive/master.zip) and upload to your `/wp-content/plugins` directory
 * Activate the plugin through the 'Plugins' menu in WordPress
 
 ## Setup
