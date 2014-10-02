@@ -1,5 +1,8 @@
 *** WooCommerce Sage ERP Connector Changelog ***
 
+2014.10.02 - version 1.2
+ * Misc - WooCommerce 2.2 compatible + required
+
 2014.03.01 - version 1.1
  * Misc - WooCommerce 2.1 compatible + required
 

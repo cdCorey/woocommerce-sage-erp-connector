@@ -295,7 +295,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 
 		if ( 'sage_erp_export_status' == $column ) {
 
-			$order = new WC_Order( $post->ID );
+			$order = wc_get_order( $post->ID );
 
 			$is_exported = ( isset( $order->wc_sage_erp_exported ) && (bool) $order->wc_sage_erp_exported );
 
@@ -534,7 +534,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 		$query_args = array(
 			'fields'      => 'ids',
 			'post_type'   => 'shop_order',
-			'post_status' => 'publish',
+			'post_status' => 'any',
 			'meta_query'  => array(
 				array(
 					'key'   => '_wc_sage_erp_exported',
@@ -582,7 +582,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 			if ( isset( $order->order_number ) ) {
 				return '#' . $order->order_number;
 			} else {
-				return '';
+				return 'ID ' . $order->id;
 			}
 		}
 
@@ -649,7 +649,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 			'meta_key'    => '_order_number',
 			'meta_value'  => $order_number,
 			'post_type'   => 'shop_order',
-			'post_status' => 'publish',
+			'post_status' => 'any',
 			'fields'      => 'ids'
 		);
 
@@ -661,7 +661,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 		}
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
-		$order = new WC_Order( $order_number );
+		$order = wc_get_order( $order_number );
 
 		// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
 		if ( isset( $order->order_number ) ) {

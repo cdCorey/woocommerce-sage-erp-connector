@@ -8,11 +8,11 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 
 ## Requirements
 
-* WordPress 3.7 (tested up to 3.9)
-* WooCommerce 2.1 (tested up to 2.2-bleeding)
+* WordPress 3.9 (tested up to 4.0.1)
+* WooCommerce 2.2 (tested up to 2.3-bleeding)
 * Sage ERP 100 or MAS 90/200 (including SQL)
 * Sage eBusiness Web Services API module (ERP 100 2014 includes this, if you are using an older version you must purchase it from Sage)
-* (optional) [Sage eBusiness Web Services Extended API](https://github.com/skyverge/sage-ebusiness-webservices-extended) if you're using a SQL version of Sage ERP and would like automatic postal code creation (see FAQ) 
+* (optional) [Sage eBusiness Web Services Extended API](https://github.com/skyverge/sage-ebusiness-webservices-extended) if you're using a SQL version of Sage ERP and would like automatic postal code creation (see FAQ)
 
 ## Installation
 

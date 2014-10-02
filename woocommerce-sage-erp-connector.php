@@ -5,7 +5,7 @@
  * Description: Export customer and order information to Sage ERP 100 via the Sage eBusiness Web Services API
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.1
+ * Version: 1.2
  * Text Domain: wc-sage-erp-connector
  * Domain Path: /languages/
  *
@@ -90,7 +90,7 @@ class WC_Sage_ERP_Connector {
 
 
 	/** plugin version number */
-	const VERSION = '1.1';
+	const VERSION = '1.2';
 
 	/** plugin text domain */
 	const TEXT_DOMAIN = 'wc-sage-erp-connector';

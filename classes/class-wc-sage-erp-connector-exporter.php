@@ -94,7 +94,7 @@ class WC_Sage_ERP_Connector_Exporter {
 
 		foreach ( $this->order_ids as $order_id ) {
 
-			$order = new WC_Order( $order_id );
+			$order = wc_get_order( $order_id );
 
 			$export = $this->export_order( $order );
 
