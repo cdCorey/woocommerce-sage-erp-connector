@@ -8,8 +8,7 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 
 ## Requirements
 
-* WordPress 3.9 (tested up to 4.0.1)
-* WooCommerce 2.2 (tested up to 2.3-bleeding)
+* WordPress 4.0 (tested up to 4.2.2)
 * Sage ERP 100 or MAS 90/200 (including SQL)
 * Sage eBusiness Web Services API module (ERP 100 2014 includes this, if you are using an older version you must purchase it from Sage)
 * (optional) [Sage eBusiness Web Services Extended API](https://github.com/skyverge/sage-ebusiness-webservices-extended) if you're using a SQL version of Sage ERP and would like automatic postal code creation (see FAQ)
@@ -21,11 +20,11 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 
 ## Setup
 
-* Configure the Sage eBusiness Web Services API and expose a public endpoint. This is beyond the scope of this readme, but you can follow the excellent walkthrough provided by Sage [here](http://infosource.sagesoftwareonline.com/sw_attach/sso/mas90/445WebServices.pdf). You'll need to also create a specific Sage user to use with the API as part of this configuration.
+* Configure the Sage eBusiness Web Services API and expose a public endpoint. This is beyond the scope of this readme, but you can follow the excellent walk-through provided by Sage [here](http://infosource.sagesoftwareonline.com/sw_attach/sso/mas90/445WebServices.pdf). You'll need to also create a specific Sage user to use with the API as part of this configuration.
 
 * In WooCommerce, browse to WooCommerce > Integrations > Sage ERP Connector and enter your API endpoint, along with the username/password for the user you created.
 
-* Enter the company code of the company you want to create customers/orders in. You'll also need to enter a division number and Salesperson number that customers & orders will be created under. Price level is optional.
+* Enter the company code of the company you want to create customers/orders in. You'll also need to enter a division number and Salesperson number that customers & orders will be created under. Price level is required.
 
 * Place a test order and click on the Sage icon in the Orders list to test the import. You'll likely see an error message or two that will need to be resolved first.
 
@@ -34,6 +33,11 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 * __Q: Is it possible to sync product stock levels from Sage?__
 No, the Sage API does not provide any methods for retrieving item stock.
 
+* __Q: How do I customize the data that's used for creating customers and sales orders?__
+Use the [`wc_sage_erp_customer`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L351-351), [`wc_sage_erp_connector_sales_order_line_item`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L290-290), and [`wc_sage_erp_connector_sales_order`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L297-297) filters. These are best used in a custom plugin -- checkout the [sample plugin](https://gist.github.com/maxrice/6a59f496cc8a2dfcff44) for more examples.
+
+* __Q: How can I learn more about the Sage eBusiness Web Services API?__
+You're in luck! Check out the out-of-print [API guide](http://cl.ly/2B3Z3n32320u)!
 
 ## Support
 
@@ -41,7 +45,7 @@ Support is only provided via GitHub, please add an issue if you're experiencing 
 
 ## License
 
-Copyright (c) 2012-2014, SkyVerge, Inc.
+Copyright (c) 2012-2015, SkyVerge, Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

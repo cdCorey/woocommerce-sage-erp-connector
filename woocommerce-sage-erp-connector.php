@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: WooCommerce Sage ERP Connector
- * Plugin URI: http://www.skyverge.com/product/woocommerce-sage-erp-connector/
+ * Plugin URI: https://github.com/skyverge/woocommerce-sage-erp-connector
  * Description: Export customer and order information to Sage ERP 100 via the Sage eBusiness Web Services API
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.2
- * Text Domain: wc-sage-erp-connector
+ * Version: 1.3
+ * Text Domain: woocommerce-sage-erp-connector
  * Domain Path: /languages/
  *
- * Copyright: (c) 2012-2014 SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2015 SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,7 +17,7 @@
  * @package   WC-Sage-ERP-Connector
  * @author    SkyVerge
  * @category  Integration
- * @copyright Copyright (c) 2013, SkyVerge, Inc.
+ * @copyright Copyright (c) 2013-2015, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -66,7 +66,7 @@ $GLOBALS['wc_sage_erp_connector'] = new WC_Sage_ERP_Connector();
  *
  * ### Global Settings
  *
- * + `wc_sage_erp_connector_options` - TODO explain serialized options array
+ * + `wc_sage_erp_connector_options` - serialized options
  *
  * ### Options table
  *
@@ -90,10 +90,10 @@ class WC_Sage_ERP_Connector {
 
 
 	/** plugin version number */
-	const VERSION = '1.2';
+	const VERSION = '1.3';
 
 	/** plugin text domain */
-	const TEXT_DOMAIN = 'wc-sage-erp-connector';
+	const TEXT_DOMAIN = 'woocommerce-sage-erp-connector';
 
 	/** @var object WP_Admin_Message_Handler instance */
 	public $messages;
@@ -203,10 +203,6 @@ class WC_Sage_ERP_Connector {
 	 */
 	public function validate_customer_fields( $value ) {
 
-		// TODO test this as my account filter and return early
-
-		// TODO refactor
-
 		// Get posted checkout_fields and do validation
 		foreach ( array( 'billing','shipping' ) as $prefix ) {
 			$name = '';
@@ -262,7 +258,7 @@ class WC_Sage_ERP_Connector {
 	public function load_translation() {
 
 		// localization in the init action for WPML support
-		load_plugin_textdomain( self::TEXT_DOMAIN, false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+		load_plugin_textdomain( 'woocommerce-sage-erp-connector', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 
 
@@ -318,16 +314,18 @@ class WC_Sage_ERP_Connector {
 		}
 
 		// CustomerNo
-		if ( ! empty( $_POST['_wc_sage_erp_customer_no'] ) )
+		if ( ! empty( $_POST['_wc_sage_erp_customer_no'] ) ) {
 			update_user_meta( $user_id, '_wc_sage_erp_customer_no', trim( $_POST['_wc_sage_erp_customer_no'] ) );
-		else
+		} else {
 			delete_user_meta( $user_id, '_wc_sage_erp_customer_no' );
+		}
 
 		// ARDivisionNo
-		if ( ! empty( $_POST['_wc_sage_erp_division_no'] ) )
+		if ( ! empty( $_POST['_wc_sage_erp_division_no'] ) ) {
 			update_user_meta( $user_id, '_wc_sage_erp_division_no', trim( $_POST['_wc_sage_erp_division_no'] ) );
-		else
+		} else {
 			delete_user_meta( $user_id, '_wc_sage_erp_division_no' );
+		}
 	}
 
 
@@ -469,4 +467,4 @@ class WC_Sage_ERP_Connector {
 	}
 
 
-} // end \WC_Sage_ERP_Connector class
+}

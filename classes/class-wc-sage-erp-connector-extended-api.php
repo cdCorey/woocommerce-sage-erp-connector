@@ -18,7 +18,7 @@
  *
  * @package     WC-Sage-ERP-Connector/Integration
  * @author      SkyVerge
- * @copyright   Copyright (c) 2013, SkyVerge, Inc.
+ * @copyright   Copyright (c) 2013-2015, SkyVerge, Inc.
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -54,7 +54,7 @@ class WC_Sage_ERP_Connector_Extended_API {
 	/**
 	 * Creates the given postcode
 	 *
-	 * @param $postcode the postal code to add
+	 * @param string $postcode postal code to add
 	 * @param string $city city name
 	 * @param string $state postal code abbreviation
 	 * @param string $country two or three character country code
@@ -117,4 +117,4 @@ class WC_Sage_ERP_Connector_Extended_API {
 	}
 
 
-} // end \WC_Sage_ERP_Connector_Extended_API class
+}

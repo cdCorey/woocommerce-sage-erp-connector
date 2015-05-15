@@ -18,7 +18,7 @@
  *
  * @package     WC-Sage-ERP-Connector/Integration
  * @author      SkyVerge
- * @copyright   Copyright (c) 2013, SkyVerge, Inc.
+ * @copyright   Copyright (c) 2013-2015, SkyVerge, Inc.
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -196,20 +196,6 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 				'type'        => 'checkbox',
 				'default'     => ''
 			),
-
-			// TODO: change this to a checkbox
-			/*'restrict_export' => array(
-				'title'       => __( 'Restrict Order Export', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
-				'desc_tip'    => __( 'Restrict order export to orders with this status', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
-				'type'        => 'select',
-				'default'     => 'none',
-				'options'     => array(
-					'none'       => __( 'None', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
-					'pending'    => __( 'Pending', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
-					'processing' => __( 'Processing', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
-					'completed'  => __( 'Completed', WC_Sage_ERP_Connector::TEXT_DOMAIN )
-				)
-			),*/
 
 			'api_endpoint' => array(
 				'title'    => __( 'API Endpoint', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
@@ -398,15 +384,11 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 
 		if ( 'shop_order' == $typenow ) :
 
-			$count_new   = $this->get_unexported_order_count();
-			$count_total = wp_count_posts( 'shop_order' );
-			$count_total = $count_total->publish;
-
-			$count_exported = $count_total - $count_new;
+			$count = $this->get_order_count();
 
 			$terms = array(
-				0 => (object) array( 'count' => $count_new, 'term' => __( 'Not Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) ),
-				1 => (object) array( 'count' => $count_exported, 'term' => __( 'Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) )
+				0 => (object) array( 'count' => $count['unexported'], 'term' => __( 'Not Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) ),
+				1 => (object) array( 'count' => $count['exported'], 'term' => __( 'Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) )
 			);
 
 			?>
@@ -491,12 +473,14 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 			check_admin_referer( 'bulk-posts' );
 
 			// make sure order IDs are submitted
-			if ( isset( $_REQUEST['post'] ) )
+			if ( isset( $_REQUEST['post'] ) ) {
 				$order_ids = array_map( 'absint', $_REQUEST['post'] );
+			}
 
 			// return if there are no orders to export
-			if ( empty( $order_ids ) )
+			if ( empty( $order_ids ) ) {
 				return;
+			}
 
 			// give ourselves an unlimited timeout if possible
 			@set_time_limit( 0 );
@@ -516,8 +500,6 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 					update_post_meta( $order_id, '_wc_sage_erp_exported', ( 'mark_exported' == $action ) ? 1 : 0 );
 				}
 			}
-
-			// TODO: handle bulk un-export action
 		}
 	}
 
@@ -529,23 +511,32 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 	 * @since 1.0
 	 * @return int number of unexported orders
 	 */
-	private function get_unexported_order_count() {
+	private function get_order_count() {
 
 		$query_args = array(
 			'fields'      => 'ids',
 			'post_type'   => 'shop_order',
-			'post_status' => 'any',
+			'post_status' => isset( $_GET['post_status'] ) ? $_GET['post_status'] : 'any',
 			'meta_query'  => array(
 				array(
 					'key'   => '_wc_sage_erp_exported',
 					'value' => 0
 				)
-			)
+			),
+			'nopaging' => true,
 		);
 
 		$query = new WP_Query( $query_args );
 
-		return count( $query->posts );
+		$unexported = count( $query->posts );
+
+		$query_args['meta_query'][0]['value'] = 1;
+
+		$query = new WP_Query( $query_args );
+
+		$exported = count( $query->posts );
+
+		return array( 'unexported' => $unexported, 'exported' => $exported );
 	}
 
 
@@ -580,7 +571,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 		if ( isset( $order->wc_sage_erp_exported ) ) {
 
 			if ( isset( $order->order_number ) ) {
-				return '#' . $order->order_number;
+				return $order->order_number; // WC 2.3 adds a hash now
 			} else {
 				return 'ID ' . $order->id;
 			}
@@ -684,4 +675,4 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 	}
 
 
-} // end \WC_Sage_ERP_Connector_Integration class
+}
