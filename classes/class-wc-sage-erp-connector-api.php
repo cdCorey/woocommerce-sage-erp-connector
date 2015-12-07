@@ -149,6 +149,11 @@ class WC_Sage_ERP_Connector_API {
 
 		// add any custom fields
 		if ( ! empty( $customer->_CustomFields ) )
+
+			if ( empty( $customer->OtherFields ) ) {
+				$customer->OtherFields = new stdClass();
+			}
+
 			$customer->OtherFields->Field = $this->pack_custom_fields( $customer->_CustomFields, array() );
 
 		try {
@@ -302,8 +307,14 @@ class WC_Sage_ERP_Connector_API {
 	public function create_sales_order( $sales_order ) {
 
 		// add custom fields
-		if ( ! empty( $sales_order->_CustomFields ) )
+		if ( ! empty( $sales_order->_CustomFields ) ) {
+
+			if ( empty( $sales_order->OtherFields ) ) {
+				$sales_order->OtherFields = new stdClass();
+			}
+
 			$sales_order->OtherFields->Field = $this->pack_custom_fields( $sales_order->_CustomFields, array() );
+		}
 
 		try {
 
