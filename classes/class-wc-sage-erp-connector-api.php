@@ -355,7 +355,8 @@ class WC_Sage_ERP_Connector_API {
 		$this->get_connection()->UpdateSalesOrder( array(
 				'logon'        => $this->get_logon(),
 				'companyCode'  => $this->company_code,
-				'salesOrderNo' => $sales_order_no
+				'salesOrderNo' => $sales_order_no,
+				'salesOrder'   => $value
 			)
 		);
 	}
