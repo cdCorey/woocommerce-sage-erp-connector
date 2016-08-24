@@ -339,7 +339,7 @@ class WC_Sage_ERP_Connector {
 	 */
 	public function add_plugin_configure_link( $actions ) {
 		// add the link to the front of the actions list
-		return ( array_merge( array( 'configure' => sprintf( '<a href="%s">%s</a>', admin_url( 'admin.php?page=woocommerce&tab=integration&section=sage_erp_connector' ), __( 'Configure', self::TEXT_DOMAIN ) ) ),
+		return ( array_merge( array( 'configure' => sprintf( '<a href="%s">%s</a>', admin_url( 'admin.php?page=wc-settings&tab=integration&section=sage_erp_connector' ), __( 'Configure', self::TEXT_DOMAIN ) ) ),
 			$actions )
 		);
 	}
