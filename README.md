@@ -34,7 +34,7 @@ This plugin pushes customers and orders from WooCommerce into Sage ERP 100 via t
 No, the Sage API does not provide any methods for retrieving item stock.
 
 * __Q: How do I customize the data that's used for creating customers and sales orders?__
-Use the [`wc_sage_erp_customer`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L351-351), [`wc_sage_erp_connector_sales_order_line_item`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L290-290), and [`wc_sage_erp_connector_sales_order`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L297-297) filters. These are best used in a custom plugin -- checkout the [sample plugin](https://gist.github.com/maxrice/6a59f496cc8a2dfcff44) for more examples.
+Use the [`wc_sage_erp_connector_customer`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L351-351), [`wc_sage_erp_connector_sales_order_line_item`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L290-290), and [`wc_sage_erp_connector_sales_order`](https://github.com/skyverge/woocommerce-sage-erp-connector/blob/master/classes/class-wc-sage-erp-connector-exporter.php#L297-297) filters. These are best used in a custom plugin -- checkout the [sample plugin](https://gist.github.com/maxrice/6a59f496cc8a2dfcff44) for more examples.
 
 * __Q: How can I learn more about the Sage eBusiness Web Services API?__
 You're in luck! Check out the out-of-print [API guide](http://cl.ly/2B3Z3n32320u)!
