@@ -156,7 +156,8 @@ class WC_Sage_ERP_Connector_Exporter {
 		global $wc_sage_erp_connector;
 
 		// if this order was already exported, ignore it
-		if ( isset( $order->wc_sage_erp_exported ) && $order->wc_sage_erp_exported ) {
+		$sage_exported = get_post_meta($order->get_id(), '_wc_sage_erp_exported', true);
+		if ( isset( $sage_exported ) && $sage_exported ) {
 			return 0;
 		}
 
@@ -169,8 +170,8 @@ class WC_Sage_ERP_Connector_Exporter {
 			$order_number = $this->get_api()->create_sales_order( $sales_order );
 
 			// update the woocommerce sales order
-			add_post_meta( $order->id, '_order_number', $order_number );
-			update_post_meta( $order->id, '_wc_sage_erp_exported', 1 );
+			add_post_meta( $order->get_id(), '_order_number', $order_number );
+			update_post_meta( $order->get_id(), '_wc_sage_erp_exported', 1 );
 
 			// add order note
 			$order->add_order_note( __( 'Order exported to Sage ERP.', WC_Sage_ERP_Connector::TEXT_DOMAIN ) );
@@ -202,7 +203,7 @@ class WC_Sage_ERP_Connector_Exporter {
 				} else {
 
 					// creation failed
-					$wc_sage_erp_connector->messages->add_error( sprintf( __( 'Export Failure - Order %s, Message : %s (%s)', WC_Sage_ERP_Connector::TEXT_DOMAIN ), $order->id, $e->getMessage(), ( isset( $e->detail->MasFault ) ) ? $e->detail->MasFault->ErrorCode . ' : ' . $e->detail->MasFault->ErrorMessage : __( 'N/A', WC_Sage_ERP_Connector::TEXT_DOMAIN ) ) );
+					$wc_sage_erp_connector->messages->add_error( sprintf( __( 'Export Failure - Order %s, Message : %s (%s)', WC_Sage_ERP_Connector::TEXT_DOMAIN ), $order->get_id(), $e->getMessage(), ( isset( $e->detail->MasFault ) ) ? $e->detail->MasFault->ErrorCode . ' : ' . $e->detail->MasFault->ErrorMessage : __( 'N/A', WC_Sage_ERP_Connector::TEXT_DOMAIN ) ) );
 
 					return false;
 				}
@@ -211,7 +212,7 @@ class WC_Sage_ERP_Connector_Exporter {
 
 				// non-postcode failure, add error message
 				$wc_sage_erp_connector->messages->add_error( sprintf( 'Export Failure - Order %s (ERP Sales Order No: %s), Message : %s (%s)',
-					$order->id,
+					$order->get_id(),
 					( isset( $e->data['SalesOrderNo'] ) ) ? $e->data['SalesOrderNo'] : __( 'N/A', WC_Sage_ERP_Connector::TEXT_DOMAIN ),
 					$e->getMessage(),
 					( isset( $e->detail->MasFault ) ) ? $e->detail->MasFault->ErrorCode . ' : ' . $e->detail->MasFault->ErrorMessage : __( 'N/A', WC_Sage_ERP_Connector::TEXT_DOMAIN )
@@ -309,6 +310,7 @@ class WC_Sage_ERP_Connector_Exporter {
 
 		// setup customer object
 		$customer = new stdClass();
+		$sage_customer_number = get_post_meta($order->get_id(), '_wc_sage_erp_customer_no', true);
 
 		// set default division number
 		if ( ! empty( $this->default_ar_division_no ) ) {
@@ -326,17 +328,17 @@ class WC_Sage_ERP_Connector_Exporter {
 		}
 
 		// get the customer number for registered customers
-		if ( $order->user_id ) {
+		if ( $order->get_customer_id() ) {
 
-			$customer->CustomerNo = get_user_meta( $order->customer_user, '_wc_sage_erp_customer_no', true );
+			$customer->CustomerNo = get_user_meta( $order->get_customer_id(), '_wc_sage_erp_customer_no', true );
 
 			// TODO: consider setting ARDivisionNo here from user meta
 
 		} else {
 
 			// otherwise for a guest purchase (has user_id = 0), check whether we've already attempted to export this order (and failed) and reuse the customer_no if so
-			if ( isset( $order->wc_sage_erp_customer_no ) && $order->wc_sage_erp_customer_no ) {
-				$customer->CustomerNo = $order->wc_sage_erp_customer_no;
+			if ( isset( $sage_customer_number ) && $sage_customer_number ) {
+				$customer->CustomerNo = $sage_customer_number;
 			}
 		}
 
@@ -359,21 +361,21 @@ class WC_Sage_ERP_Connector_Exporter {
 		}
 
 		// save sage info to user if registered
-		if ( $order->user_id ) {
+		if ( $order->get_customer_id() ) {
 
 			// customer number
-			update_user_meta( $order->user_id, '_wc_sage_erp_customer_no', $customer->CustomerNo );
+			update_user_meta( $order->get_customer_id(), '_wc_sage_erp_customer_no', $customer->CustomerNo );
 
 			// division number
-			update_user_meta( $order->user_id, '_wc_sage_erp_division_no', $customer->ARDivisionNo );
+			update_user_meta( $order->get_customer_id(), '_wc_sage_erp_division_no', $customer->ARDivisionNo );
 
 			// mark as having been created
-			update_user_meta( $order->user_id, '_wc_sage_erp_exported', 1 );
+			update_user_meta( $order->get_customer_id(), '_wc_sage_erp_exported', 1 );
 		}
 
 		// add CustomerNo/DivisionNo as order meta so it can be looked up even for guest purchases
-		update_post_meta( $order->id, '_wc_sage_erp_customer_no', $customer->CustomerNo );
-		update_post_meta( $order->id, '_wc_sage_erp_division_no', $customer->ARDivisionNo );
+		update_post_meta( $order->get_customer_id(), '_wc_sage_erp_customer_no', $customer->CustomerNo );
+		update_post_meta( $order->get_customer_id(), '_wc_sage_erp_division_no', $customer->ARDivisionNo );
 
 		return $customer;
 	}
@@ -396,32 +398,34 @@ class WC_Sage_ERP_Connector_Exporter {
 		try {
 
 			// if this order has not been exported, ignore it
-			if ( ! isset( $order->wc_sage_erp_exported ) || ! $order->wc_sage_erp_exported ) {
+			$sage_exported = get_post_meta($order->get_id(), '_wc_sage_erp_exported', true);
+			if ( ! isset( $sage_exported ) || ! $sage_exported ) {
 				return false;
 			}
 
 			// if order has an attached MAS order number, delete from MAS
-			if ( isset( $order->order_number ) && $order->order_number ) {
-				$this->get_api()->delete_sales_order( $order->order_number );
+			$sage_order_number = get_post_meta($order->get_id(), '_order_number', true);
+			if ( isset( $sage_order_number ) && $sage_order_number ) {
+				$this->get_api()->delete_sales_order( $sage_order_number );
 			}
 
 			// reset woocommerce order record
-			delete_post_meta( $order->id, '_wc_sage_erp_division_no' );
-			delete_post_meta( $order->id, '_wc_sage_erp_customer_no' );
-			delete_post_meta( $order->id, '_order_number' );
-			update_post_meta( $order->id, '_wc_sage_erp_exported', 0 );
+			delete_post_meta( $order->get_id(), '_wc_sage_erp_division_no' );
+			delete_post_meta( $order->get_id(), '_wc_sage_erp_customer_no' );
+			delete_post_meta( $order->get_id(), '_order_number' );
+			update_post_meta( $order->get_id(), '_wc_sage_erp_exported', 0 );
 
 
 			$unexport_customer = true;
 
 			// is this a non-guest purchase?
-			if ( $order->user_id ) {
+			if ( $order->get_customer_id() ) {
 
 				// check whether this user has any other exported orders
 				$args = array(
 					'numberposts' => - 1,
 					'meta_key'    => '_customer_user',
-					'meta_value'  => $order->user_id,
+					'meta_value'  => $order->get_customer_id(),
 					'post_type'   => 'shop_order',
 					'post_status' => 'publish'
 				);
@@ -432,7 +436,7 @@ class WC_Sage_ERP_Connector_Exporter {
 					foreach ( $customer_orders as $customer_order ) {
 
 						// check other orders
-						if ( $customer_order->ID != $order->id ) {
+						if ( $customer_order->ID != $order->get_id() ) {
 
 							// customer has at least one other exported order record, so we won't unexport the customer for now
 							if ( get_post_meta( $customer_order->ID, '_wc_sage_erp_exported', true ) ) {
@@ -446,20 +450,21 @@ class WC_Sage_ERP_Connector_Exporter {
 			}
 
 			// if we are able to unexport the the customer and have a MAS customer number, delete from MAS
-			if ( $unexport_customer && isset( $order->wc_sage_erp_customer_no ) && $order->wc_sage_erp_customer_no ) {
-				$this->get_api()->delete_customer( $order->wc_sage_erp_customer_no );
+			$sage_customer_number = get_post_meta($order->get_id(), '_wc_sage_erp_customer_no', true);
+			if ( $unexport_customer && isset( $sage_customer_number ) && $sage_customer_number ) {
+				$this->get_api()->delete_customer( $sage_customer_number );
 			}
 
 			// reset woocommerce user record
-			if ( $order->user_id && $unexport_customer ) {
-				delete_user_meta( $order->user_id, '_wc_sage_erp_division_no' );
-				delete_user_meta( $order->user_id, '_wc_sage_erp_customer_no' );
-				delete_user_meta( $order->user_id, '_wc_sage_erp_exported' );
+			if ( $order->get_customer_id() && $unexport_customer ) {
+				delete_user_meta( $order->get_customer_id(), '_wc_sage_erp_division_no' );
+				delete_user_meta( $order->get_customer_id(), '_wc_sage_erp_customer_no' );
+				delete_user_meta( $order->get_customer_id(), '_wc_sage_erp_exported' );
 			}
 
 		} catch ( SoapFault $e ) {
 
-			$wc_sage_erp_connector->messages->add_error( sprintf( 'Order %s: %s (%s)', $order->id, $e->getMessage(), ( isset( $e->detail->MasFault ) ) ? $e->detail->MasFault->ErrorCode . ' - ' . $e->detail->MasFault->ErrorMessage : '' ) );
+			$wc_sage_erp_connector->messages->add_error( sprintf( 'Order %s: %s (%s)', $order->get_id(), $e->getMessage(), ( isset( $e->detail->MasFault ) ) ? $e->detail->MasFault->ErrorCode . ' - ' . $e->detail->MasFault->ErrorMessage : '' ) );
 
 			return false;
 		}
@@ -487,9 +492,9 @@ class WC_Sage_ERP_Connector_Exporter {
 		}
 
 		if ( 'billing' === $type ) {
-			return $this->extended_api->create_postcode( $order->billing_postcode, $order->billing_city, $order->billing_state, $order->billing_country );
+			return $this->extended_api->create_postcode( $order->get_billing_postcode(), $order->get_billing_city(), $order->get_billing_state(), $order->get_billing_country() );
 		} else {
-			return $this->extended_api->create_postcode( $order->shipping_postcode, $order->shipping_city, $order->shipping_state, $order->shipping_country );
+			return $this->extended_api->create_postcode( $order->get_shipping_postcode(), $order->get_shipping_city(), $order->get_shipping_state(), $order->get_shipping_country() );
 		}
 	}
 

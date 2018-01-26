@@ -283,7 +283,9 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 
 			$order = wc_get_order( $post->ID );
 
-			$is_exported = ( isset( $order->wc_sage_erp_exported ) && (bool) $order->wc_sage_erp_exported );
+			$sage_exported = get_post_meta($order->get_id(), '_wc_sage_erp_exported', true);
+
+			$is_exported = ( isset( $sage_exported ) && (bool) $sage_exported );
 
 			printf( '<mark class="%1$s tips" data-tip="%2$s">%2$s</mark>', ( true == $is_exported ) ? 'sage_erp_exported' : 'sage_erp_not_exported', ( true == $is_exported ) ? __( 'Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) : __( 'Not Exported', WC_Sage_ERP_Connector::TEXT_DOMAIN ) );
 		}
@@ -305,8 +307,10 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 
 		$name = __( 'Export to Sage ERP', WC_Sage_ERP_Connector::TEXT_DOMAIN );
 
-		if ( ! isset( $order->wc_sage_erp_exported ) || ! $order->wc_sage_erp_exported ) {
-			printf( '<a class="button tips" href="%s" data-tip="%s"><img style="width: 24px;" src="%s" alt="%s" class="wc_sage_erp_export_icon" /></a>', wp_nonce_url( admin_url( 'admin-ajax.php?action=wc_sage_erp_connector_export_order&order_id=' . $order->id ), 'wc_sage_erp_connector_export_order' ), $name, $ico_url, $name );
+		$sage_exported = get_post_meta($order->get_id(), '_wc_sage_erp_exported', true);
+
+		if ( ! isset( $sage_exported ) || ! $sage_exported ) {
+			printf( '<a class="button tips" href="%s" data-tip="%s"><img style="width: 24px;" src="%s" alt="%s" class="wc_sage_erp_export_icon" /></a>', wp_nonce_url( admin_url( 'admin-ajax.php?action=wc_sage_erp_connector_export_order&order_id=' . $order->get_id() ), 'wc_sage_erp_connector_export_order' ), $name, $ico_url, $name );
 		}
 	}
 
@@ -368,7 +372,7 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 	 */
 	public function process_order_meta_box_actions( $order ) {
 
-		$sage_order = new WC_Sage_ERP_Connector_Exporter( $order->id );
+		$sage_order = new WC_Sage_ERP_Connector_Exporter( $order->get_id() );
 
 		$sage_order->export();
 	}
@@ -568,12 +572,15 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 	 */
 	public function get_order_number( $order_number, $order ) {
 
-		if ( isset( $order->wc_sage_erp_exported ) ) {
+		$sage_exported = get_post_meta($order->get_id(), '_wc_sage_erp_exported', true);
+		$sage_order_number = get_post_meta($order->get_id(), '_order_number', true);
 
-			if ( isset( $order->order_number ) ) {
-				return $order->order_number; // WC 2.3 adds a hash now
+		if ( isset( $sage_exported ) ) {
+
+			if ( isset( $sage_order_number ) ) {
+				return $sage_order_number; // WC 2.3 adds a hash now
 			} else {
-				return 'ID ' . $order->id;
+				return 'ID ' . $order->get_id();
 			}
 		}
 
@@ -655,11 +662,12 @@ class WC_Sage_ERP_Connector_Integration extends WC_Integration {
 		$order = wc_get_order( $order_number );
 
 		// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
-		if ( isset( $order->order_number ) ) {
+		$sage_order_number = get_post_meta($order->get_id(), '_order_number', true);
+		if ( isset( $sage_order_number ) ) {
 			return 0;
 		}
 
-		return $order->id;
+		return $order->get_id();
 	}
 
 
